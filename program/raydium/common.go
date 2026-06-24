@@ -16,3 +16,12 @@ type RaydiumSwapBaseOutInstructionParam struct {
 	AmountOut   decimal.Decimal
 	MaxAmountIn decimal.Decimal
 }
+
+type RaydiumCLLMSwapInstructionParam struct {
+	Accounts            []types.AccountMeta
+	Amount              decimal.Decimal
+	OtherAmountThreshod decimal.Decimal
+	SqrtPriceLimitX64   decimal.Decimal
+	IsBaseInput         bool
+	Version             int
+}
