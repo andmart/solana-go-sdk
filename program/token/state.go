@@ -61,12 +61,31 @@ type MintAccount struct {
 	Decimals        uint8
 	IsInitialized   bool
 	FreezeAuthority *common.PublicKey
+	Extensions      map[uint16][]byte
+	IsToken2022      bool
+}
+
+func findTLVStart(data []byte, start int) int {
+	for i := start; i < len(data)-4; i++ {
+		extType := binary.LittleEndian.Uint16(data[i:])
+		extLen := binary.LittleEndian.Uint16(data[i+2:])
+
+		// validação mínima
+		if extType == 0 || extLen == 0 {
+			continue
+		}
+
+		if i+4+int(extLen) <= len(data) {
+			return i
+		}
+	}
+	return -1
 }
 
 func MintAccountFromData(data []byte) (MintAccount, error) {
-	if len(data) != MintAccountSize {
-		return MintAccount{}, ErrInvalidAccountDataSize
-	}
+	// if len(data) != MintAccountSize {
+	// 	return MintAccount{}, ErrInvalidAccountDataSize
+	// }
 
 	var mint *common.PublicKey
 	if bytes.Equal(data[:4], Some) {
@@ -86,13 +105,52 @@ func MintAccountFromData(data []byte) (MintAccount, error) {
 		freezeAuthority = &key
 	}
 
-	return MintAccount{
+	mintAccount := MintAccount{
 		MintAuthority:   mint,
 		Supply:          supply,
 		Decimals:        decimals,
 		IsInitialized:   isInitialized,
 		FreezeAuthority: freezeAuthority,
-	}, nil
+	}
+
+	extensions := make(map[uint16][]byte)
+
+	offset := 166
+
+	for offset < len(data) {
+		// padding defensivo
+		if offset+4 > len(data) {
+			break
+		}
+
+		extType := binary.LittleEndian.Uint16(data[offset:])
+		extLen := binary.LittleEndian.Uint16(data[offset+2:])
+		offset += 4
+
+		if extLen == 0 {
+			continue
+		}
+
+		if offset+int(extLen) > len(data) {
+			break
+		}
+
+		extData := make([]byte, extLen)
+		copy(extData, data[offset:offset+int(extLen)])
+
+		extensions[extType] = extData
+
+		offset += int(extLen)
+	}
+
+	mintAccount.Extensions = extensions
+
+	// for extType, extData := range extensions {
+	// 	fmt.Printf("Extension type: %d, data: %x\n", extType, extData)
+	// }
+
+	return mintAccount, nil
+
 }
 
 const TokenAccountSize = 165
@@ -107,11 +165,13 @@ const (
 
 // TokenAccount is token program account
 type TokenAccount struct {
-	Mint     common.PublicKey
-	Owner    common.PublicKey
-	Amount   uint64
-	Delegate *common.PublicKey
-	State    TokenAccountState
+	Mint         common.PublicKey
+	Owner        common.PublicKey
+	Amount       uint64
+	AmountString string
+	Decimals     uint8
+	Delegate     *common.PublicKey
+	State        TokenAccountState
 	// if is wrapped SOL, IsNative is the rent-exempt value
 	IsNative        *uint64
 	DelegatedAmount uint64
@@ -119,9 +179,9 @@ type TokenAccount struct {
 }
 
 func TokenAccountFromData(data []byte) (TokenAccount, error) {
-	if len(data) != TokenAccountSize {
-		return TokenAccount{}, ErrInvalidAccountDataSize
-	}
+	// if len(data) != TokenAccountSize {
+	// 	return TokenAccount{}, ErrInvalidAccountDataSize
+	// }
 
 	mint := common.PublicKeyFromBytes(data[:32])
 

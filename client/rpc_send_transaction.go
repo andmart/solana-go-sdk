@@ -35,7 +35,7 @@ func (c *Client) SendTransaction(ctx context.Context, tx types.Transaction) (str
 			return c.RpcClient.SendTransactionWithConfig(
 				ctx,
 				base64.StdEncoding.EncodeToString(rawTx),
-				SendTransactionConfig{}.toRpc(),
+				SendTransactionConfig{SkipPreflight: true, MaxRetries: 50}.toRpc(),
 			)
 		},
 		forward[string],

@@ -17,7 +17,7 @@ func TestGetTokenAccountsByOwner(t *testing.T) {
 				ResponseBody: `{"jsonrpc":"2.0","result":{"context":{"slot":88024144},"value":[{"account":{"data":"error: data too large for bs58 encoding","executable":false,"lamports":2039280,"owner":"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA","rentEpoch":203},"pubkey":"AyHWro8zumyZN68Mhuk6mhNUUQ2VX5qux2pMD4HnN3aJ"}]},"id":1}`,
 				F: func(url string) (any, error) {
 					c := NewRpcClient(url)
-					return c.GetTokenAccountsByOwner(
+					return c.GetTokenAccountsByOwnerWithFilter(
 						context.TODO(),
 						"27kVX7JpPZ1bsrSckbR76mV6GeRqtrjoddubfg2zBpHZ",
 						GetTokenAccountsByOwnerConfigFilter{
@@ -54,7 +54,7 @@ func TestGetTokenAccountsByOwner(t *testing.T) {
 				ResponseBody: `{"jsonrpc":"2.0","result":{"context":{"slot":88024144},"value":[{"account":{"data":"error: data too large for bs58 encoding","executable":false,"lamports":2039280,"owner":"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA","rentEpoch":203},"pubkey":"AyHWro8zumyZN68Mhuk6mhNUUQ2VX5qux2pMD4HnN3aJ"}]},"id":1}`,
 				F: func(url string) (any, error) {
 					c := NewRpcClient(url)
-					return c.GetTokenAccountsByOwner(
+					return c.GetTokenAccountsByOwnerWithFilter(
 						context.TODO(),
 						"27kVX7JpPZ1bsrSckbR76mV6GeRqtrjoddubfg2zBpHZ",
 						GetTokenAccountsByOwnerConfigFilter{

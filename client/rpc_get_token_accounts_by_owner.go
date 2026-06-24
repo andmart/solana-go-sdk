@@ -13,6 +13,18 @@ type TokenAccount struct {
 	PublicKey common.PublicKey
 }
 
+func (c *Client) GetTokenAccountsByOwner(ctx context.Context, owner string) ([]TokenAccount, error) {
+	return process(
+		func() (rpc.JsonRpcResponse[rpc.ValueWithContext[rpc.GetProgramAccounts]], error) {
+			return c.RpcClient.GetTokenAccountsByOwner(
+				ctx,
+				owner,
+			)
+		},
+		convertGetTokenAccountsByOwner,
+	)
+}
+
 func (c *Client) GetTokenAccountsByOwnerByMint(ctx context.Context, owner, mintAddr string) ([]TokenAccount, error) {
 	return process(
 		func() (rpc.JsonRpcResponse[rpc.ValueWithContext[rpc.GetProgramAccounts]], error) {

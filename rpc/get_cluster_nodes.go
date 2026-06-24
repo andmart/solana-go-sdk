@@ -7,13 +7,20 @@ type GetClusterNodesResponse JsonRpcResponse[GetClusterNodes]
 type GetClusterNodes []GetClusterNode
 
 type GetClusterNode struct {
-	Pubkey       string
-	Gossip       *string
-	Tpu          *string
-	Rpc          *string
-	Version      *string
-	FeatureSet   *uint32
-	ShredVersion *uint16
+	FeatureSet      uint64 `json:"featureSet,omitempty"`
+	Gossip          string `json:"gossip,omitempty"`
+	Pubkey          string `json:"pubkey"`
+	Pubsub          string `json:"pubsub,omitempty"`
+	RPC             string `json:"rpc,omitempty"`
+	ServeRepair     string `json:"serveRepair,omitempty"`
+	ShredVersion    int    `json:"shredVersion,omitempty"`
+	TPU             string `json:"tpu,omitempty"`
+	TPUForwards     string `json:"tpuForwards,omitempty"`
+	TPUForwardsQuic string `json:"tpuForwardsQuic,omitempty"`
+	TPUQuic         string `json:"tpuQuic,omitempty"`
+	TPUVote         string `json:"tpuVote,omitempty"`
+	TVU             string `json:"tvu,omitempty"`
+	Version         string `json:"version,omitempty"`
 }
 
 // GetClusterNodes returns information about all the nodes participating in the cluster
